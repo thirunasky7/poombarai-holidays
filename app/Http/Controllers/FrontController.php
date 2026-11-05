@@ -7,7 +7,6 @@ use App\Models\Destination;
 use App\Models\Faq;
 use App\Models\Package;
 use App\Models\Page;
-use App\Models\Room;
 use App\Models\ShortVideo;
 use App\Models\TourPlan;
 
@@ -20,14 +19,6 @@ class FrontController extends Controller
             'banners' => Banner::where('is_active', true)->orderBy('sort_order')->get(),
             'shorts' => ShortVideo::where('is_active', true)->orderBy('sort_order')->get(),
             'packages' => Package::where('is_active', true)->orderBy('sort_order')->get(),
-        ]);
-    }
-
-    public function rooms()
-    {
-        return view('front.rooms', [
-            'page' => Page::where('slug', 'stays')->firstOrFail(),
-            'rooms' => Room::with('images')->where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }
 
@@ -52,15 +43,26 @@ class FrontController extends Controller
     public function package(Package $package)
     {
         abort_unless($package->is_active, 404);
-        $package->load('images');
+        $package->load(['images', 'destinations']);
         $frames = $package->galleryFrames();
+        $summary = trim((string) $package->summary);
+        $metaDescription = $summary !== ''
+            ? \Illuminate\Support\Str::limit($summary.' Enquire on WhatsApp from Poombarai, Kodaikanal. No payment on this site.', 155)
+            : $package->name.' sightseeing package from Poombarai village near Kodaikanal. View photos and enquire on WhatsApp.';
 
         $page = new Page([
-            'meta_title' => $package->name.' | Poombarai package',
-            'meta_description' => 'Photos of '.$package->name.' in Poombarai, Kodaikanal. Enquire on WhatsApp. Nothing is booked or paid here.',
-            'keywords' => $package->name.', Poombarai package, Kodaikanal Homestay, Village Stay Kodaikanal',
+            'meta_title' => $package->name.' from Poombarai | Kodaikanal Sightseeing',
+            'meta_description' => $metaDescription,
+            'keywords' => implode(', ', array_filter([
+                $package->name,
+                'Poombarai package',
+                'Kodaikanal sightseeing',
+                'Poombarai Homestay',
+                'Village Stay Kodaikanal',
+                'Kodaikanal Car Rental',
+            ])),
             'banner_url' => $package->imageSrc() ?: null,
-            'banner_alt' => $package->image_alt,
+            'banner_alt' => $package->image_alt ?: ($package->name.' from Poombarai, Kodaikanal'),
             'h1' => $package->name,
         ]);
 
@@ -68,6 +70,11 @@ class FrontController extends Controller
             'page' => $page,
             'package' => $package,
             'frames' => $frames,
+            'related' => Package::where('is_active', true)
+                ->where('id', '!=', $package->id)
+                ->orderBy('sort_order')
+                ->take(4)
+                ->get(['id', 'slug', 'name']),
         ]);
     }
 }

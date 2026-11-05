@@ -13,7 +13,17 @@ class SeoController extends Controller
         $site = $settings->all();
         $base = rtrim($site['site_url'] ?: url('/'), '/');
         $pages = Page::query()->orderBy('sort_order')->get();
-        $packages = Package::where('is_active', true)->orderBy('sort_order')->get(['slug', 'updated_at']);
+        $packages = Package::where('is_active', true)->orderBy('sort_order')->get();
+        $packages->transform(function (Package $package) use ($base) {
+            $src = $package->imageSrc();
+            if ($src && ! preg_match('#^https?://#i', $src)) {
+                $src = $base.'/'.ltrim($src, '/');
+            }
+            $package->setAttribute('image_src', $src);
+            $package->setAttribute('image_alt', $package->image_alt);
+
+            return $package;
+        });
 
         return response()
             ->view('seo.sitemap', compact('base', 'pages', 'packages'))

@@ -192,6 +192,11 @@
     }
     const body = el("div", "card-body");
     body.append(el("h3", null, item.name || item.id));
+    if (item.summary) {
+      const summary = String(item.summary).replace(/<[^>]+>/g, "").trim();
+      const short = summary.length > 110 ? summary.slice(0, 107).trim() + "..." : summary;
+      if (short) body.append(el("p", null, short));
+    }
     const detail = document.createElement("a");
     detail.className = "btn btn-line";
     detail.href = href;

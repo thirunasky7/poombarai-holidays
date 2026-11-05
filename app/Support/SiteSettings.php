@@ -123,6 +123,7 @@ class SiteSettings
             'packages' => $packages->map(fn (Package $package) => [
                 'id' => $package->slug,
                 'name' => $package->name,
+                'summary' => $package->summary,
                 'image' => ['src' => $package->imageSrc(), 'alt' => $package->image_alt],
                 'images' => collect($package->galleryFrames())->values(),
             ])->values(),
@@ -198,8 +199,8 @@ class SiteSettings
             'price_range' => '₹₹',
             'geo_lat' => '10.2514',
             'geo_lng' => '77.4086',
-            'footer_note' => 'Stays in Poombarai village, with cars and a guide for Kodaikanal. Fares are confirmed on WhatsApp before you travel.',
-            'keywords' => 'Poombarai homestay, Poombarai cottage, Kodaikanal Poombarai village stay, car rental Poombarai, sightseeing from Poombarai',
+            'footer_note' => 'Poombarai Homestay and Kodaikanal Car Rental from the village. Fares are confirmed on WhatsApp before you travel. Nothing is paid on this website.',
+            'keywords' => 'Poombarai Homestay, Kodaikanal Homestay, Village Stay Kodaikanal, Poombarai Rooms, Kodaikanal Car Rental',
         ];
     }
 }

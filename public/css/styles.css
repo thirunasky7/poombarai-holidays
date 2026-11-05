@@ -672,7 +672,8 @@ h1, h2, h3,
 .card-body .btn, .plan-actions .btn { margin-top: 0.75rem; }
 .stay-card .btn, .info-card .btn { width: 100%; }
 
-.text-link { display: inline-block; margin-top: 0.55rem; font-weight: 600; color: var(--pine-800); }
+.text-link { display: inline; margin-top: 0; font-weight: 600; color: var(--pine-800); text-decoration: underline; text-underline-offset: 0.12em; }
+.choice-card > .text-link { display: inline-block; margin-top: 0.55rem; }
 
 .badge-row { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .badge { background: #e7f5ec; color: var(--pine-900); font-weight: 600; font-size: 0.8rem; border-radius: 999px; padding: 0.2rem 0.55rem; }
@@ -1265,10 +1266,23 @@ h1, h2, h3,
   border: 1px solid rgba(28, 36, 22, 0.08);
 }
 .home-package img { width: 100%; height: 11rem; object-fit: cover; }
-.home-package-body { display: grid; gap: 0.65rem; padding: 0.9rem 0.9rem 1rem; justify-items: center; text-align: center; }
+.home-package-body { display: grid; gap: 0.55rem; padding: 0.9rem 0.9rem 1rem; justify-items: center; text-align: center; }
 .home-package h3 { margin: 0; font-size: 1.15rem; color: var(--pine-900); text-align: center; }
-.home-package-body p { margin: 0; }
+.home-package-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  max-width: 22rem;
+}
 .home-package .btn { width: 100%; max-width: 12rem; margin-top: 0.1rem; }
+.package-only-card .card-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  max-width: 22rem;
+}
 
 .home-enquiry { padding-top: 1.5rem; }
 .home-enquiry-grid { display: grid; gap: 1.25rem; align-items: start; }

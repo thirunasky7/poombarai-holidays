@@ -1,10 +1,49 @@
 @extends('layouts.site')
 
+@php
+  $seoBase = rtrim($site['site_url'] ?: url('/'), '/');
+@endphp
+
+@push('head')
+<script type="application/ld+json">
+{!! json_encode([
+  '@context' => 'https://schema.org',
+  '@type' => 'WebSite',
+  'name' => $site['business_name'],
+  'url' => $seoBase.'/',
+  'description' => $page->meta_description,
+  'inLanguage' => 'en-IN',
+  'about' => [
+      '@type' => 'LodgingBusiness',
+      'name' => $site['business_name'],
+      'address' => $site['address'],
+  ],
+], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
+</script>
+@if($packages->isNotEmpty())
+<script type="application/ld+json">
+{!! json_encode([
+  '@context' => 'https://schema.org',
+  '@type' => 'ItemList',
+  'name' => 'Poombarai sightseeing packages from Kodaikanal village',
+  'itemListElement' => $packages->values()->map(function ($package, $index) use ($seoBase) {
+      return [
+          '@type' => 'ListItem',
+          'position' => $index + 1,
+          'url' => $seoBase.'/packages/'.$package->slug,
+          'name' => $package->name,
+      ];
+  })->all(),
+], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endif
+@endpush
+
 @section('content')
   <section class="home-banner" data-home-banner aria-roledescription="carousel" aria-label="What we offer">
     @forelse($banners as $banner)
       <article class="home-slide" data-banner-slide @unless($loop->first) hidden @endunless aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
-        <img src="{{ $banner->imageSrc() }}" alt="{{ $banner->image_alt }}" width="1600" height="900" @unless($loop->first) loading="lazy" @endunless decoding="async">
+        <img src="{{ $banner->imageSrc() }}" alt="{{ $banner->image_alt ?: ($banner->title.' in Poombarai, Kodaikanal') }}" width="1600" height="900" @unless($loop->first) loading="lazy" @endunless decoding="async">
         <div class="home-slide-copy">
           <p class="home-slide-kicker">{{ $page->eyebrow }}</p>
           <h2>{{ $banner->title }}</h2>
@@ -62,11 +101,20 @@
     </section>
   @endif
 
-  <section class="band" aria-labelledby="packages-heading">
+  <header class="page-intro">
+    <div class="wrap">
+      <p class="eyebrow">{{ $page->eyebrow }}</p>
+      <h1>{{ $page->h1 }}</h1>
+      <p class="lede">{{ $page->intro }}</p>
+      <p class="lede">Browse <a class="text-link" href="{{ route('places') }}">places to visit from the village</a>, or <a class="text-link" href="{{ route('contact') }}">WhatsApp us</a> for a Poombarai stay and Kodaikanal car rental.</p>
+    </div>
+  </header>
+
+  <section class="band" style="padding-top:0" aria-labelledby="packages-heading">
     <div class="wrap">
       <div class="section-head">
         <h2 id="packages-heading" class="section-title">Package</h2>
-        <p class="lede">Open a package to see its photos. Enquire on WhatsApp when you are ready.</p>
+        <p class="lede">Kodaikanal sightseeing packages from Poombarai. Open a package for photos, then enquire on WhatsApp. Fares are confirmed before you travel. Nothing is paid on this site.</p>
       </div>
       @if($packages->isNotEmpty())
         <div class="home-packages">
@@ -74,11 +122,14 @@
             <article class="home-package">
               @if($package->imageSrc())
                 <a href="{{ route('packages.show', $package) }}" tabindex="-1" aria-hidden="true">
-                  <img src="{{ $package->imageSrc() }}" alt="{{ $package->image_alt ?: $package->name }}" width="640" height="420" loading="lazy" decoding="async">
+                  <img src="{{ $package->imageSrc() }}" alt="{{ $package->image_alt ?: ($package->name.' sightseeing package from Poombarai, Kodaikanal') }}" width="640" height="420" loading="lazy" decoding="async">
                 </a>
               @endif
               <div class="home-package-body">
                 <h3>{{ $package->name }}</h3>
+                @if($package->summary)
+                  <p>{{ \Illuminate\Support\Str::limit(strip_tags($package->summary), 110) }}</p>
+                @endif
                 <a class="btn btn-line" href="{{ route('packages.show', $package) }}">View detail</a>
               </div>
             </article>

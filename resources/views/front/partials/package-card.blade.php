@@ -8,6 +8,9 @@
   @endif
   <div class="card-body">
     <h3>{{ $package->name }}</h3>
+    @if($package->summary)
+      <p>{{ \Illuminate\Support\Str::limit(strip_tags($package->summary), 110) }}</p>
+    @endif
     <a class="btn btn-line" href="{{ route('packages.show', $package) }}">View detail</a>
   </div>
 </article>

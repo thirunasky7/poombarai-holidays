@@ -20,7 +20,7 @@ use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontController::class, 'home'])->name('home');
-Route::get('/stays', [FrontController::class, 'rooms'])->name('rooms');
+Route::redirect('/stays', '/', 301);
 Route::get('/places', [FrontController::class, 'places'])->name('places');
 Route::get('/packages/{package:slug}', [FrontController::class, 'package'])->name('packages.show');
 Route::get('/contact', [FrontController::class, 'contact'])->name('contact');

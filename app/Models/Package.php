@@ -37,15 +37,19 @@ class Package extends Model
     public function galleryFrames(): array
     {
         $frames = [];
+        $fallback = $this->name.' in Poombarai, Kodaikanal';
         if ($this->imageSrc()) {
-            $frames[] = ['src' => $this->imageSrc(), 'alt' => $this->image_alt ?: $this->name];
+            $frames[] = ['src' => $this->imageSrc(), 'alt' => $this->image_alt ?: $fallback];
         }
-        foreach ($this->images as $image) {
+        foreach ($this->images as $index => $image) {
             $src = $image->src();
             if (! $src) {
                 continue;
             }
-            $frames[] = ['src' => $src, 'alt' => $image->alt ?: $this->name];
+            $frames[] = [
+                'src' => $src,
+                'alt' => $image->alt ?: ($this->name.' photo '.($index + 1).' — Poombarai village stay near Kodaikanal'),
+            ];
         }
 
         return $frames;

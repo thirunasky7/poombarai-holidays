@@ -2,15 +2,30 @@
   $base = rtrim($site['site_url'] ?: url('/'), '/');
   $path = request()->getPathInfo() ?: '/';
   $canonical = $base.($path === '/' ? '/' : $path);
+  $toAbsolute = function (?string $url) use ($base): string {
+      if (! $url) {
+          return '';
+      }
+      if (preg_match('#^https?://#i', $url)) {
+          return $url;
+      }
+
+      return $base.'/'.ltrim($url, '/');
+  };
+  $ogImage = $toAbsolute($page->bannerUrl() ?: $heroUrl);
+  $logoAbsolute = ! empty($logoUrl) ? $toAbsolute($logoUrl) : '';
+  $wa = 'https://wa.me/'.preg_replace('/\D+/', '', $site['whatsapp_number']);
   $schema = [
       '@context' => 'https://schema.org',
-      '@type' => ['LocalBusiness', 'LodgingBusiness'],
+      '@type' => ['LocalBusiness', 'LodgingBusiness', 'TravelAgency'],
+      '@id' => $base.'/#business',
       'name' => $site['business_name'],
       'url' => $base.'/',
       'telephone' => $site['phone'],
       'email' => $site['email'],
-      'image' => $heroUrl,
-      'description' => $page->meta_description,
+      'image' => array_values(array_filter([$ogImage, $toAbsolute($heroUrl)])),
+      'logo' => $logoAbsolute ?: $ogImage,
+      'description' => $page->meta_description ?: ($site['footer_note'] ?? ''),
       'address' => [
           '@type' => 'PostalAddress',
           'streetAddress' => $site['address'],
@@ -26,12 +41,35 @@
       ],
       'openingHours' => $site['hours'],
       'priceRange' => $site['price_range'] ?: '₹₹',
+      'currenciesAccepted' => 'INR',
+      'paymentAccepted' => 'Cash, UPI (confirmed off-site)',
       'areaServed' => [
           ['@type' => 'Place', 'name' => 'Poombarai'],
           ['@type' => 'Place', 'name' => 'Kodaikanal'],
+          ['@type' => 'Place', 'name' => 'Dindigul'],
+          ['@type' => 'AdministrativeArea', 'name' => 'Tamil Nadu'],
+      ],
+      'knowsAbout' => [
+          'Poombarai Homestay',
+          'Kodaikanal Homestay',
+          'Village Stay Kodaikanal',
+          'Poombarai Rooms',
+          'Kodaikanal Car Rental',
+      ],
+      'sameAs' => array_values(array_filter([
+          $site['maps_link'] ?? null,
+          $wa,
+      ])),
+      'contactPoint' => [
+          [
+              '@type' => 'ContactPoint',
+              'telephone' => $site['phone'],
+              'contactType' => 'reservations',
+              'areaServed' => 'IN',
+              'availableLanguage' => ['English', 'Tamil'],
+          ],
       ],
   ];
-  $wa = 'https://wa.me/'.preg_replace('/\D+/', '', $site['whatsapp_number']);
   $current = request()->route()?->getName();
 @endphp
 <!DOCTYPE html>
@@ -42,6 +80,8 @@
   <title>{{ $page->meta_title }}</title>
   <meta name="description" content="{{ $page->meta_description }}">
   <meta name="keywords" content="{{ $page->keywords ?: $site['keywords'] }}">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="{{ $site['business_name'] }}">
   <link rel="canonical" href="{{ $canonical }}">
   <meta name="geo.region" content="IN-TN">
   <meta name="geo.placename" content="Poombarai, Kodaikanal">
@@ -52,9 +92,13 @@
   <meta property="og:title" content="{{ $page->meta_title }}">
   <meta property="og:description" content="{{ $page->meta_description }}">
   <meta property="og:url" content="{{ $canonical }}">
-  <meta property="og:image" content="{{ $page->bannerUrl() ?: $heroUrl }}">
+  <meta property="og:image" content="{{ $ogImage }}">
+  <meta property="og:image:alt" content="{{ $page->banner_alt ?: ($site['hero_image_alt'] ?? $site['business_name']) }}">
   <meta property="og:locale" content="en_IN">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ $page->meta_title }}">
+  <meta name="twitter:description" content="{{ $page->meta_description }}">
+  <meta name="twitter:image" content="{{ $ogImage }}">
   <link rel="icon" href="{{ $faviconUrl }}" type="{{ $faviconType }}">
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link rel="stylesheet" href="https://fonts.bunny.net/css?family=source-sans-3:400,600,700|source-serif-4:600,700&display=swap">
@@ -70,7 +114,7 @@
     <div class="wrap header-bar">
       <a class="brand" href="{{ route('home') }}">
         @if($logoUrl)
-          <img class="brand-logo" src="{{ $logoUrl }}" alt="">
+          <img class="brand-logo" src="{{ $logoUrl }}" alt="{{ $site['business_name'] }} logo">
         @else
           <span class="brand-mark" aria-hidden="true">P</span>
         @endif
@@ -81,7 +125,10 @@
       </a>
       <nav class="desktop-nav" aria-label="Primary">
         @foreach($navPages as $nav)
-          @php $navRoute = $nav->slug === 'home' ? 'home' : ($nav->slug === 'stays' ? 'rooms' : $nav->slug); @endphp
+          @php
+            if ($nav->slug === 'stays') { continue; }
+            $navRoute = $nav->slug === 'home' ? 'home' : $nav->slug;
+          @endphp
           <a href="{{ route($navRoute) }}" @if($current === $navRoute) aria-current="page" @endif>{{ $nav->nav_label }}</a>
         @endforeach
       </nav>
@@ -103,7 +150,10 @@
     </div>
     <nav id="mobile-nav" class="mobile-nav" hidden>
       @foreach($navPages as $nav)
-        @php $navRoute = $nav->slug === 'home' ? 'home' : ($nav->slug === 'stays' ? 'rooms' : $nav->slug); @endphp
+        @php
+          if ($nav->slug === 'stays') { continue; }
+          $navRoute = $nav->slug === 'home' ? 'home' : $nav->slug;
+        @endphp
         <a href="{{ route($navRoute) }}" @if($current === $navRoute) aria-current="page" @endif>{{ $nav->nav_label }}</a>
       @endforeach
       <div class="mobile-nav-extra">
@@ -112,12 +162,11 @@
           <button type="button" data-lang="en" aria-pressed="true">English</button>
           <button type="button" data-lang="ta" aria-pressed="false">Tamil</button>
         </div>
-        <p class="lang-status" data-lang-status>WhatsApp message: English</p>
-        <div class="mobile-nav-actions">
-          <button type="button" class="btn btn-clay" data-open-enquiry>Book now</button>
-          <a class="btn btn-wa" data-enquiry-type="general" data-item-name="Menu WhatsApp" href="{{ $wa }}">WhatsApp</a>
-          <a class="btn btn-clay" data-bind-href="tel" href="tel:{{ preg_replace('/[^\d+]/', '', $site['phone']) }}">Call</a>
-        </div>
+      </div>
+      <div class="mobile-nav-actions">
+        <button type="button" class="btn btn-clay" data-open-enquiry>Book now</button>
+        <a class="btn btn-wa" data-enquiry-type="general" data-item-name="Mobile menu WhatsApp" href="{{ $wa }}">WhatsApp</a>
+        <a class="btn btn-line" data-bind-href="tel" href="tel:{{ preg_replace('/[^\d+]/', '', $site['phone']) }}">Call</a>
       </div>
     </nav>
   </header>
@@ -149,6 +198,7 @@
     <div class="wrap footer-grid">
       <div>
         <p class="footer-name" data-bind="name">{{ $site['business_name'] }}</p>
+        <p>Poombarai Homestay &amp; Kodaikanal Car Rental from the village.</p>
         <p data-bind="address">{{ $site['address'] }}</p>
         <p data-bind="hours">{{ $site['hours'] }}</p>
       </div>
@@ -156,8 +206,10 @@
         <h2 class="footer-title">Explore</h2>
         <ul>
           @foreach($navPages as $nav)
-            <li><a href="{{ $nav->slug === 'home' ? route('home') : route($nav->slug === 'stays' ? 'rooms' : $nav->slug) }}">{{ $nav->nav_label }}</a></li>
+            @if($nav->slug === 'stays') @continue @endif
+            <li><a href="{{ $nav->slug === 'home' ? route('home') : route($nav->slug) }}">{{ $nav->nav_label }}</a></li>
           @endforeach
+          <li><a href="{{ route('home') }}#packages-heading">Sightseeing packages</a></li>
         </ul>
       </div>
       <div>
@@ -165,6 +217,7 @@
         <ul>
           <li><a data-bind-href="tel" data-bind="phone" href="tel:{{ preg_replace('/[^\d+]/', '', $site['phone']) }}">{{ $site['phone'] }}</a></li>
           <li><a data-bind-href="mail" data-bind="email" href="mailto:{{ $site['email'] }}">{{ $site['email'] }}</a></li>
+          <li><a href="{{ $site['maps_link'] }}">Google Maps — Poombarai</a></li>
         </ul>
         <p class="footer-cta"><a class="btn btn-wa" data-enquiry-type="general" data-item-name="Footer WhatsApp" href="{{ $wa }}">WhatsApp</a></p>
       </div>
@@ -175,7 +228,7 @@
         <p>{{ $site['footer_note'] }}</p>
       </div>
     </div>
-    <p class="copyright">© <span data-year>{{ date('Y') }}</span> <span data-bind="name">{{ $site['business_name'] }}</span></p>
+    <p class="copyright">© <span data-year>{{ date('Y') }}</span> <span data-bind="name">{{ $site['business_name'] }}</span> · Village stay Kodaikanal</p>
   </footer>
   <script>window.SITE_CONFIG = @json($waConfig); window.SITE_DATA = @json($waData);</script>
   <script src="{{ asset('js/whatsapp.js') }}"></script>
