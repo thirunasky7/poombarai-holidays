@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
+use App\Models\Enquiry;
 use App\Models\Faq;
 use App\Models\Package;
 use App\Models\Review;
@@ -18,7 +19,12 @@ class DashboardController extends Controller
     public function index()
     {
         return view('admin.dashboard', [
+            'recentEnquiries' => Enquiry::query()->latest()->take(5)->get(),
             'counts' => [
+                'Enquiries' => Enquiry::count(),
+                'New enquiries' => Enquiry::where('status', 'new')->count(),
+                'Pending' => Enquiry::where('status', 'pending')->count(),
+                'Confirmed' => Enquiry::where('status', 'confirmed')->count(),
                 'Stays' => Room::count(),
                 'Stay photos' => RoomImage::count(),
                 'Vehicles' => Vehicle::count(),

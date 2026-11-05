@@ -62,80 +62,31 @@
     </section>
   @endif
 
-  <section class="band home-intro">
-    <div class="wrap home-intro-inner">
-      <p class="eyebrow">{{ $page->eyebrow }}</p>
-      <h1>{{ $page->h1 }}</h1>
-      <p class="lede">{{ $page->intro }}</p>
-    </div>
-  </section>
-
-  <section class="band" style="padding-top:0" aria-label="Choose what you need">
-    <div class="wrap choice-cards">
-      <a class="choice-card" href="{{ route('rooms') }}">
-        <p class="kicker">1 · Stay</p>
-        <h2>Sleep in Poombarai</h2>
-        <p>A room, cottage, or homestay in the village.</p>
-        <span class="text-link">See stays</span>
-      </a>
-      <a class="choice-card" href="{{ route('cars') }}">
-        <p class="kicker">2 · Car</p>
-        <h2>Hire a car and guide</h2>
-        <p>A driver who knows the road to the lake and viewpoints.</p>
-        <span class="text-link">See cars</span>
-      </a>
-      <a class="choice-card" href="{{ route('places') }}">
-        <p class="kicker">3 · Places</p>
-        <h2>Pick where to go</h2>
-        <p>Start in the village, then Kodai Lake and the viewpoints.</p>
-        <span class="text-link">See places</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="band" style="background:#fff;padding-top:0" aria-labelledby="how-heading">
+  <section class="band" aria-labelledby="packages-heading">
     <div class="wrap">
-      <h2 id="how-heading" class="section-title">How booking works</h2>
-      <ol class="steps">
-        <li><strong>Message us</strong><span>Send your dates, or the places you want to see, on WhatsApp.</span></li>
-        <li><strong>We reply</strong><span>You get a room or a car, and the price, in the chat.</span></li>
-        <li><strong>You confirm</strong><span>Nothing is booked until you say yes. This site does not take payment.</span></li>
-      </ol>
-    </div>
-  </section>
-
-  @if($rooms->isNotEmpty())
-    <section class="band" style="padding-top:0" aria-labelledby="stays-heading">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="stays-heading" class="section-title">Stays guests ask for first</h2>
-          <p class="lede">Prices are a starting rate for the night. We confirm the exact price on WhatsApp.</p>
-        </div>
-        <div class="home-stays">
-          @foreach($rooms as $room)
-            <a class="home-stay" href="{{ route('rooms') }}#{{ $room->slug }}">
-              @if($room->cover())
-                <img src="{{ $room->cover()->src() }}" alt="{{ $room->cover()->alt }}" width="640" height="420" loading="lazy" decoding="async">
+      <div class="section-head">
+        <h2 id="packages-heading" class="section-title">Package</h2>
+        <p class="lede">Open a package to see its photos. Enquire on WhatsApp when you are ready.</p>
+      </div>
+      @if($packages->isNotEmpty())
+        <div class="home-packages">
+          @foreach($packages as $package)
+            <article class="home-package">
+              @if($package->imageSrc())
+                <a href="{{ route('packages.show', $package) }}" tabindex="-1" aria-hidden="true">
+                  <img src="{{ $package->imageSrc() }}" alt="{{ $package->image_alt ?: $package->name }}" width="640" height="420" loading="lazy" decoding="async">
+                </a>
               @endif
-              <span class="kicker">{{ $room->type }} · up to {{ $room->occupancy }} guests</span>
-              <strong>{{ $room->name }}</strong>
-              <span>{{ $room->price_label }}</span>
-            </a>
+              <div class="home-package-body">
+                <h3>{{ $package->name }}</h3>
+                <a class="btn btn-line" href="{{ route('packages.show', $package) }}">View detail</a>
+              </div>
+            </article>
           @endforeach
         </div>
-        <p class="mt-6"><a class="btn btn-line" href="{{ route('rooms') }}">All stays</a></p>
-      </div>
-    </section>
-  @endif
-
-  <section class="cta-band band" aria-labelledby="cta-heading">
-    <div class="wrap">
-      <h2 id="cta-heading">Ask on WhatsApp</h2>
-      <p>Tell us if you need a stay, a car, or both. We reply during the hours in the footer.</p>
-      <div class="cta-actions">
-        <a class="btn btn-wa" data-enquiry-type="general" data-item-name="Home call to action" href="https://wa.me/{{ preg_replace('/\D+/', '', $site['whatsapp_number']) }}">WhatsApp the host</a>
-        <a class="btn btn-clay" data-bind-href="tel" href="tel:{{ preg_replace('/[^\d+]/', '', $site['phone']) }}">Call <span data-bind="phone">{{ $site['phone'] }}</span></a>
-      </div>
+      @else
+        <p class="lede">Packages will appear here once they are added in admin.</p>
+      @endif
     </div>
   </section>
 @endsection

@@ -35,19 +35,9 @@
           <a class="btn btn-line" data-bind-href="mail" href="mailto:{{ $site['email'] }}">Email <span data-bind="email">{{ $site['email'] }}</span></a>
         </div>
         <div class="enquiry-card">
-          <form class="js-contact-form" novalidate>
-            <h2 id="contact-form-heading" class="form-title">General enquiry</h2>
-            <p class="lang-status" data-lang-status>WhatsApp message: English</p>
-            <div class="form-grid">
-              <div class="field"><label for="k-name">Full name</label><input id="k-name" data-field="name" autocomplete="name" required maxlength="80"><p class="error-text" data-error-for="name" hidden></p></div>
-              <div class="field"><label for="k-phone">Mobile number</label><input id="k-phone" data-field="phone" type="tel" required maxlength="16"><p class="error-text" data-error-for="phone" hidden></p></div>
-              <div class="field"><label for="k-email">Email <span class="hint">(optional)</span></label><input id="k-email" data-field="email" type="email" maxlength="120"><p class="error-text" data-error-for="email" hidden></p></div>
-              <div class="field"><label for="k-message">Message</label><textarea id="k-message" data-field="message" required maxlength="500" rows="4" placeholder="Tell us your dates, group size, or the train you are arriving on."></textarea><p class="error-text" data-error-for="message" hidden></p></div>
-            </div>
-            <p class="visually-hidden" data-form-status aria-live="assertive"></p>
-            <div class="form-actions"><button type="submit" class="btn btn-wa">Send on WhatsApp</button></div>
-            <p class="form-note">The form does not email us by itself. It opens WhatsApp with your message ready to send.</p>
-          </form>
+          <h2 id="contact-form-heading" class="form-title">General enquiry</h2>
+          <p class="form-note">We reply on WhatsApp.</p>
+          <button type="button" class="btn btn-clay" data-open-enquiry data-service="general">Enquire</button>
         </div>
       </div>
       <div>

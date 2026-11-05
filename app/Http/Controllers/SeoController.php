@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Package;
 use App\Models\Page;
 use App\Support\SiteSettings;
 
@@ -12,9 +13,10 @@ class SeoController extends Controller
         $site = $settings->all();
         $base = rtrim($site['site_url'] ?: url('/'), '/');
         $pages = Page::query()->orderBy('sort_order')->get();
+        $packages = Package::where('is_active', true)->orderBy('sort_order')->get(['slug', 'updated_at']);
 
         return response()
-            ->view('seo.sitemap', compact('base', 'pages'))
+            ->view('seo.sitemap', compact('base', 'pages', 'packages'))
             ->header('Content-Type', 'application/xml');
     }
 

@@ -56,6 +56,8 @@
   <meta property="og:locale" content="en_IN">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="{{ $faviconUrl }}" type="{{ $faviconType }}">
+  <link rel="preconnect" href="https://fonts.bunny.net">
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=source-sans-3:400,600,700|source-serif-4:600,700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="{{ asset('js/tailwind-config.js') }}"></script>
   <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
@@ -88,12 +90,16 @@
           <button type="button" data-lang="en" aria-pressed="true">EN</button>
           <button type="button" data-lang="ta" aria-pressed="false">TA</button>
         </div>
+        <button type="button" class="btn btn-clay header-book" data-open-enquiry>Book now</button>
         <a class="btn btn-wa header-wa" data-enquiry-type="general" data-item-name="Header WhatsApp" href="{{ $wa }}">WhatsApp</a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
-          <span class="nav-toggle-bars" aria-hidden="true"></span>
-          <span class="nav-toggle-label visually-hidden">Menu</span>
-        </button>
       </div>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+        <span class="nav-toggle-bars" aria-hidden="true"></span>
+        <span class="nav-toggle-label visually-hidden">Menu</span>
+      </button>
+    </div>
+    <div class="wrap header-book-bar">
+      <button type="button" class="btn btn-clay" data-open-enquiry>Book now</button>
     </div>
     <nav id="mobile-nav" class="mobile-nav" hidden>
       @foreach($navPages as $nav)
@@ -108,6 +114,7 @@
         </div>
         <p class="lang-status" data-lang-status>WhatsApp message: English</p>
         <div class="mobile-nav-actions">
+          <button type="button" class="btn btn-clay" data-open-enquiry>Book now</button>
           <a class="btn btn-wa" data-enquiry-type="general" data-item-name="Menu WhatsApp" href="{{ $wa }}">WhatsApp</a>
           <a class="btn btn-clay" data-bind-href="tel" href="tel:{{ preg_replace('/[^\d+]/', '', $site['phone']) }}">Call</a>
         </div>
@@ -115,8 +122,29 @@
     </nav>
   </header>
   <main id="main">
+    @if(session('enquiry'))
+      <section class="enquiry-success-band" aria-labelledby="enquiry-saved-heading">
+        <div class="wrap enquiry-success">
+          <h2 id="enquiry-saved-heading">Enquiry {{ session('enquiry.reference') }} is saved</h2>
+          <p>This is not a confirmed booking. @if(session('enquiry.mail_sent')) We also emailed the details. @else Email could not be sent from this server, so use WhatsApp or the phone number if you want a faster reply. @endif WhatsApp opens with the details filled in. The message is sent only after you tap send there.</p>
+          <a class="btn btn-wa" href="{{ session('enquiry.whatsapp') }}">Open WhatsApp with this enquiry</a>
+        </div>
+      </section>
+    @endif
     @yield('content')
   </main>
+  <dialog id="book-dialog" class="book-dialog" aria-labelledby="book-dialog-heading" @if($errors->any()) data-open-on-load @endif>
+    <div class="enquiry-card book-dialog-card">
+      <button type="button" class="book-dialog-close" data-close-enquiry aria-label="Close">×</button>
+      @include('front.partials.enquiry-form', [
+        'prefix' => 'q',
+        'heading' => 'Plan your trip',
+        'headingId' => 'book-dialog-heading',
+        'service' => 'room',
+        'destinations' => $enquiryPlaces ?? collect(),
+      ])
+    </div>
+  </dialog>
   <footer class="site-footer">
     <div class="wrap footer-grid">
       <div>

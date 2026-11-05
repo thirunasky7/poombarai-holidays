@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Destination;
 use App\Support\SiteSettings;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
@@ -33,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
                             'waConfig' => $settings->whatsappConfig(),
                             'waData' => Schema::hasTable('rooms') ? $settings->scriptData() : [],
                             'navPages' => Schema::hasTable('pages') ? $settings->pages() : collect(),
+                            'enquiryPlaces' => Schema::hasTable('destinations')
+                                ? Destination::query()->where('is_active', true)->orderBy('sort_order')->get(['name'])
+                                : collect(),
                         ];
                     }
                 } catch (\Throwable $e) {

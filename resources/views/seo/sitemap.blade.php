@@ -13,4 +13,10 @@
     <lastmod>{{ $page->updated_at->toDateString() }}</lastmod>
   </url>
 @endforeach
+@foreach($packages as $package)
+  <url>
+    <loc>{{ $base }}/packages/{{ $package->slug }}</loc>
+    <lastmod>{{ $package->updated_at->toDateString() }}</lastmod>
+  </url>
+@endforeach
 </urlset>

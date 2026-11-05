@@ -97,7 +97,7 @@ class SiteSettings
     {
         $rooms = Room::with('images')->where('is_active', true)->orderBy('sort_order')->get();
         $vehicles = Vehicle::where('is_active', true)->orderBy('sort_order')->get();
-        $packages = Package::with('destinations')->where('is_active', true)->orderBy('sort_order')->get();
+        $packages = Package::with(['destinations', 'images'])->where('is_active', true)->orderBy('sort_order')->get();
         $places = Destination::where('is_active', true)->orderBy('sort_order')->get();
         $plans = TourPlan::with('stops.destination')->where('is_active', true)->orderBy('sort_order')->get();
 
@@ -122,7 +122,9 @@ class SiteSettings
             ])->values(),
             'packages' => $packages->map(fn (Package $package) => [
                 'id' => $package->slug,
+                'name' => $package->name,
                 'image' => ['src' => $package->imageSrc(), 'alt' => $package->image_alt],
+                'images' => collect($package->galleryFrames())->values(),
             ])->values(),
             'destinations' => $places->map(fn (Destination $place) => [
                 'id' => $place->slug,

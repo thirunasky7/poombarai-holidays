@@ -85,19 +85,6 @@ class SiteContentSeeder extends Seeder
                 'sort_order' => 2,
             ],
             [
-                'slug' => 'cars',
-                'nav_label' => 'Cars & guide',
-                'meta_title' => 'Poombarai Car Rental with Tourist Guide | Kodaikanal',
-                'meta_description' => 'Hire a sedan, SUV, Innova or tempo from Poombarai village. Local sightseeing, outstation and Madurai transfers, with an optional Tamil and English guide.',
-                'keywords' => 'Poombarai car rental, taxi from Poombarai, Kodaikanal tourist guide, sightseeing car Poombarai',
-                'eyebrow' => 'Cars and guide',
-                'h1' => 'A car from Poombarai, with a driver who knows the ghats',
-                'intro' => 'Pickup is usually at your Poombarai stay. We also collect guests from Kodaikanal town, Madurai airport and Madurai Junction. Fares below are sedan-style starting estimates. The WhatsApp reply is the fare that counts.',
-                'banner_url' => $this->photo('photo-1469474968028-56623f02e42e'),
-                'banner_alt' => 'Sunlit path through green hills',
-                'sort_order' => 3,
-            ],
-            [
                 'slug' => 'places',
                 'nav_label' => 'Places',
                 'meta_title' => 'Places to Visit from Poombarai, Kodaikanal',
@@ -318,7 +305,7 @@ class SiteContentSeeder extends Seeder
     private function faqs(): void
     {
         $rows = [
-            ['Is the stay in Poombarai or in Kodaikanal town?', 'Most cottages and the family homestay are in Poombarai village, about 18 km from Kodaikanal town. One homestay is in town if you prefer that. The car page covers both pickups.'],
+            ['Is the stay in Poombarai or in Kodaikanal town?', 'Most cottages and the family homestay are in Poombarai village, about 18 km from Kodaikanal town. One homestay is in town if you prefer that. Tell us which pickup you need when you enquire.'],
             ['How do I book?', 'Send your dates, group size and the stay or car you want on WhatsApp. We reply with availability and a fare. Nothing is booked until you confirm that reply.'],
             ['Can I pay on this website?', 'No. This site does not take payment or card details. You confirm the fare on WhatsApp and pay the host as agreed.'],
             ['What are the stay times?', 'Check-in is from 1:00 PM and check-out is by 11:00 AM. Bring a photo ID. Early arrivals can leave bags if the room is not ready.'],
@@ -346,7 +333,7 @@ class SiteContentSeeder extends Seeder
 
         $rows = [
             ['Stay in Poombarai', 'Cottages and homestays in the village.', 'See stays', '/stays', 'photo-1449158743715-0a90ebb6d2d8', 'Wooden cottage among trees'],
-            ['A car and a guide', 'See the lake and viewpoints from the village.', 'See cars', '/cars', 'photo-1469474968028-56623f02e42e', 'Sunlit path through green hills'],
+            ['A car and a guide', 'See the lake and viewpoints from the village.', 'Book a car', '/#q-service', 'photo-1469474968028-56623f02e42e', 'Sunlit path through green hills'],
             ['Places nearby', 'The village, Kodai Lake, and the viewpoints.', 'See places', '/places', 'photo-1506905925346-21bda4d32df4', 'Mountain ridge above a valley'],
         ];
 

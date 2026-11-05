@@ -7,11 +7,9 @@ use App\Models\Destination;
 use App\Models\Faq;
 use App\Models\Package;
 use App\Models\Page;
-use App\Models\Review;
 use App\Models\Room;
 use App\Models\ShortVideo;
 use App\Models\TourPlan;
-use App\Models\Vehicle;
 
 class FrontController extends Controller
 {
@@ -21,7 +19,7 @@ class FrontController extends Controller
             'page' => Page::where('slug', 'home')->firstOrFail(),
             'banners' => Banner::where('is_active', true)->orderBy('sort_order')->get(),
             'shorts' => ShortVideo::where('is_active', true)->orderBy('sort_order')->get(),
-            'rooms' => Room::with('images')->where('is_active', true)->where('featured', true)->orderBy('sort_order')->take(3)->get(),
+            'packages' => Package::where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }
 
@@ -30,15 +28,6 @@ class FrontController extends Controller
         return view('front.rooms', [
             'page' => Page::where('slug', 'stays')->firstOrFail(),
             'rooms' => Room::with('images')->where('is_active', true)->orderBy('sort_order')->get(),
-        ]);
-    }
-
-    public function cars()
-    {
-        return view('front.cars', [
-            'page' => Page::where('slug', 'cars')->firstOrFail(),
-            'vehicles' => Vehicle::where('is_active', true)->orderBy('sort_order')->get(),
-            'packages' => Package::with('destinations')->where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }
 
@@ -56,6 +45,29 @@ class FrontController extends Controller
         return view('front.contact', [
             'page' => Page::where('slug', 'contact')->firstOrFail(),
             'faqs' => Faq::where('is_active', true)->orderBy('sort_order')->get(),
+            'places' => Destination::where('is_active', true)->orderBy('sort_order')->get(),
+        ]);
+    }
+
+    public function package(Package $package)
+    {
+        abort_unless($package->is_active, 404);
+        $package->load('images');
+        $frames = $package->galleryFrames();
+
+        $page = new Page([
+            'meta_title' => $package->name.' | Poombarai package',
+            'meta_description' => 'Photos of '.$package->name.' in Poombarai, Kodaikanal. Enquire on WhatsApp. Nothing is booked or paid here.',
+            'keywords' => $package->name.', Poombarai package, Kodaikanal Homestay, Village Stay Kodaikanal',
+            'banner_url' => $package->imageSrc() ?: null,
+            'banner_alt' => $package->image_alt,
+            'h1' => $package->name,
+        ]);
+
+        return view('front.package', [
+            'page' => $page,
+            'package' => $package,
+            'frames' => $frames,
         ]);
     }
 }

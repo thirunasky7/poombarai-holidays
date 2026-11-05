@@ -96,6 +96,7 @@
       Cottage: ["Cottage", "காட்டேஜ்"],
       Homestay: ["Homestay", "ஹோம்ஸ்டே"],
       "car rental": ["car rental", "கார் வாடகை"],
+      car: ["car", "கார்"],
       "tour package": ["tour package", "சுற்றுலா தொகுப்பு"],
       "short video": ["short video", "குறும்படம்"],
       Any: ["Any", "எதுவும்"],

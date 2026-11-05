@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'Admin') · {{ $site['business_name'] ?? 'Poombarai' }}</title>
+  <link rel="preconnect" href="https://fonts.bunny.net">
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=source-sans-3:400,600,700&display=swap">
   <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
 <body>
@@ -11,6 +13,7 @@
     <nav class="admin-nav" aria-label="Admin">
       <strong>Superadmin</strong>
       <a href="{{ route('admin.dashboard') }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>Dashboard</a>
+      <a href="{{ route('admin.enquiries.index') }}" @if(request()->routeIs('admin.enquiries.*')) aria-current="page" @endif>Enquiries</a>
       <a href="{{ route('admin.settings.edit') }}">Site settings</a>
       <a href="{{ route('admin.pages.index') }}">Pages &amp; SEO</a>
       <a href="{{ route('admin.banners.index') }}">Home banners</a>

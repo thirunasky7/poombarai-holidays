@@ -23,8 +23,8 @@ window.tailwind.config = {
         wa: "#146C43",
       },
       fontFamily: {
-        display: ["Fraunces", "Georgia", "serif"],
-        sans: ["Outfit", "Segoe UI", "sans-serif"],
+        display: ["Source Serif 4", "Georgia", "serif"],
+        sans: ["Source Sans 3", "Segoe UI", "sans-serif"],
       },
       boxShadow: {
         card: "0 16px 40px -28px rgba(20, 48, 38, 0.55)",

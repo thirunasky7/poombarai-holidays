@@ -31,13 +31,14 @@ class PackageController extends Controller
     {
         $package = Package::create($this->payload($request));
         $package->destinations()->sync($request->input('destinations', []));
+        $this->storePhotos($request, $package);
 
         return redirect()->route('admin.packages.edit', $package)->with('status', 'Package created.');
     }
 
     public function edit(Package $package)
     {
-        $package->load('destinations');
+        $package->load(['destinations', 'images']);
 
         return view('admin.packages.form', [
             'package' => $package,
@@ -49,12 +50,17 @@ class PackageController extends Controller
     {
         $package->update($this->payload($request, $package));
         $package->destinations()->sync($request->input('destinations', []));
+        $this->syncPhotos($request, $package);
+        $this->storePhotos($request, $package);
 
         return redirect()->route('admin.packages.edit', $package)->with('status', 'Package saved.');
     }
 
     public function destroy(Package $package)
     {
+        foreach ($package->images as $image) {
+            Media::delete($image->path);
+        }
         Media::delete($package->image_path);
         $package->delete();
 
@@ -75,6 +81,12 @@ class PackageController extends Controller
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
             'destinations' => ['nullable', 'array'],
             'destinations.*' => ['integer', 'exists:destinations,id'],
+            'photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'photo_alts.*' => ['nullable', 'string', 'max:180'],
+            'existing_alts' => ['nullable', 'array'],
+            'existing_alts.*' => ['nullable', 'string', 'max:180'],
+            'remove_images' => ['nullable', 'array'],
+            'remove_images.*' => ['integer'],
         ]);
 
         $path = $package?->image_path;
@@ -99,5 +111,43 @@ class PackageController extends Controller
             'is_active' => $request->boolean('is_active'),
             'sort_order' => $data['sort_order'] ?? 0,
         ];
+    }
+
+    private function storePhotos(Request $request, Package $package): void
+    {
+        if (! $request->hasFile('photos')) {
+            return;
+        }
+
+        $alts = $request->input('photo_alts', []);
+        $start = (int) $package->images()->max('sort_order') + 1;
+
+        foreach ($request->file('photos') as $index => $file) {
+            if (! $file) {
+                continue;
+            }
+            $package->images()->create([
+                'path' => Media::store($file, 'packages/gallery'),
+                'alt' => $alts[$index] ?? $package->name,
+                'sort_order' => $start + $index,
+            ]);
+        }
+    }
+
+    private function syncPhotos(Request $request, Package $package): void
+    {
+        $alts = $request->input('existing_alts', []);
+        $remove = array_map('intval', $request->input('remove_images', []));
+
+        foreach ($package->images as $image) {
+            if (in_array($image->id, $remove, true)) {
+                Media::delete($image->path);
+                $image->delete();
+                continue;
+            }
+            if (isset($alts[$image->id])) {
+                $image->update(['alt' => $alts[$image->id] ?: $package->name]);
+            }
+        }
     }
 }

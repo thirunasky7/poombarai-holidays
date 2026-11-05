@@ -25,7 +25,7 @@
       </div>
       <p class="occupancy">Up to {{ $room->occupancy }} guests</p>
     </div>
-    <button type="button" class="btn btn-wa" data-enquiry-type="{{ $room->type }}" data-item-name="{{ $room->name }}" data-price="{{ $room->price_label }}">Enquire on WhatsApp</button>
+    <button type="button" class="btn btn-wa" data-open-enquiry data-service="room" data-item-name="{{ $room->name }}">Enquire</button>
     @if($compact ?? false)
       <a class="text-link" href="{{ route('rooms') }}#{{ $room->slug }}">View details</a>
     @endif

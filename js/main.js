@@ -175,21 +175,28 @@
   }
 
   function packageCard(item) {
-    const article = el("article", "info-card");
+    const article = el("article", "info-card package-only-card");
     article.id = item.id;
-    article.appendChild(gallery(item, "package", true));
+    const href = "/packages/" + encodeURIComponent(item.id);
+    const images = item.images && item.images.length ? item.images : (item.image ? [item.image] : []);
+    if (images.length) {
+      const link = document.createElement("a");
+      link.className = "package-thumb-link";
+      link.href = href;
+      link.tabIndex = -1;
+      link.setAttribute("aria-hidden", "true");
+      const media = el("div", "media media-wide");
+      media.appendChild(makeImg(images[0]));
+      link.appendChild(media);
+      article.appendChild(link);
+    }
     const body = el("div", "card-body");
-    const meta = el("div", "card-meta");
-    meta.append(el("p", "price", item.fare), el("p", "occupancy", item.duration));
-    body.append(
-      el("p", "kicker", "Sightseeing"),
-      el("h3", null, item.name),
-      el("p", "summary", item.summary),
-      nameList(item.places),
-      meta,
-      el("p", "price-note", "Sedan estimate. Final fare on WhatsApp."),
-      enquireButton("Enquire on WhatsApp", "tour package", item.name, item.priceLabel)
-    );
+    body.append(el("h3", null, item.name || item.id));
+    const detail = document.createElement("a");
+    detail.className = "btn btn-line";
+    detail.href = href;
+    detail.textContent = "View detail";
+    body.appendChild(detail);
     article.appendChild(body);
     return article;
   }
@@ -814,9 +821,46 @@
     });
   }
 
+  function initBookDialog() {
+    const dialog = document.getElementById("book-dialog");
+    if (!dialog || typeof dialog.showModal !== "function") return;
+    const service = dialog.querySelector("[name='service_type']");
+    const item = dialog.querySelector("[name='service_name']");
+
+    function openDialog(trigger) {
+      if (service && trigger && trigger.hasAttribute("data-service")) {
+        service.value = trigger.getAttribute("data-service");
+      }
+      if (item && trigger && trigger.hasAttribute("data-item-name")) {
+        item.value = trigger.getAttribute("data-item-name");
+      }
+      if (!dialog.open) dialog.showModal();
+      const name = dialog.querySelector("[name='name']");
+      if (name) name.focus();
+    }
+
+    document.addEventListener("click", function (event) {
+      const trigger = event.target instanceof Element ? event.target.closest("[data-open-enquiry]") : null;
+      if (!trigger) return;
+      event.preventDefault();
+      openDialog(trigger);
+    });
+
+    const close = dialog.querySelector("[data-close-enquiry]");
+    if (close) close.addEventListener("click", function () { dialog.close(); });
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) dialog.close();
+    });
+
+    if (dialog.hasAttribute("data-open-on-load") || location.hash === "#book" || location.hash === "#q-service") {
+      openDialog(null);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initAnalytics();
     initNav();
+    initBookDialog();
     renderPage();
     if (window.KodaiWhatsApp) window.KodaiWhatsApp.init();
     applyConfig();
