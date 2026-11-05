@@ -27,7 +27,7 @@
     </div>
     <button type="button" class="btn btn-wa" data-open-enquiry data-service="room" data-item-name="{{ $room->name }}">Enquire</button>
     @if($compact ?? false)
-      <a class="text-link" href="{{ route('rooms') }}#{{ $room->slug }}">View details</a>
+      <a class="text-link" href="{{ route('contact') }}">Enquire about {{ $room->name }}</a>
     @endif
   </div>
 </article>

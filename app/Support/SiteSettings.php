@@ -169,7 +169,10 @@ class SiteSettings
 
     public function pages()
     {
-        return Page::query()->orderBy('sort_order')->get();
+        return Page::query()
+            ->whereIn('slug', ['home', 'places', 'contact'])
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function defaults(): array

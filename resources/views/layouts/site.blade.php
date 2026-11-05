@@ -126,9 +126,14 @@
       <nav class="desktop-nav" aria-label="Primary">
         @foreach($navPages as $nav)
           @php
-            if ($nav->slug === 'stays') { continue; }
-            $navRoute = $nav->slug === 'home' ? 'home' : $nav->slug;
+            $navRoute = match ($nav->slug) {
+              'home' => 'home',
+              'places' => 'places',
+              'contact' => 'contact',
+              default => null,
+            };
           @endphp
+          @continue(! $navRoute)
           <a href="{{ route($navRoute) }}" @if($current === $navRoute) aria-current="page" @endif>{{ $nav->nav_label }}</a>
         @endforeach
       </nav>
@@ -151,9 +156,14 @@
     <nav id="mobile-nav" class="mobile-nav" hidden>
       @foreach($navPages as $nav)
         @php
-          if ($nav->slug === 'stays') { continue; }
-          $navRoute = $nav->slug === 'home' ? 'home' : $nav->slug;
+          $navRoute = match ($nav->slug) {
+            'home' => 'home',
+            'places' => 'places',
+            'contact' => 'contact',
+            default => null,
+          };
         @endphp
+        @continue(! $navRoute)
         <a href="{{ route($navRoute) }}" @if($current === $navRoute) aria-current="page" @endif>{{ $nav->nav_label }}</a>
       @endforeach
       <div class="mobile-nav-extra">
@@ -206,8 +216,16 @@
         <h2 class="footer-title">Explore</h2>
         <ul>
           @foreach($navPages as $nav)
-            @if($nav->slug === 'stays') @continue @endif
-            <li><a href="{{ $nav->slug === 'home' ? route('home') : route($nav->slug) }}">{{ $nav->nav_label }}</a></li>
+            @php
+              $navRoute = match ($nav->slug) {
+                'home' => 'home',
+                'places' => 'places',
+                'contact' => 'contact',
+                default => null,
+              };
+            @endphp
+            @continue(! $navRoute)
+            <li><a href="{{ route($navRoute) }}">{{ $nav->nav_label }}</a></li>
           @endforeach
           <li><a href="{{ route('home') }}#packages-heading">Sightseeing packages</a></li>
         </ul>
